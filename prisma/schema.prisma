@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id           String @id @default(cuid())
+  mint         String @unique
+  ticker       String
+  issuer       String
+  priceUsdc    BigInt @map("price_usdc")
+  totalSupply  BigInt @map("total_supply")
+  freeFloat    BigInt @map("free_float")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  trades       Trade[]
+  positions    Position[]
+  dividends    Dividend[]
+
+  @@map("assets")
+}
+
+model Trade {
+  id        String   @id @default(cuid())
+  sig       String   @unique
+  ts        DateTime
+  mint      String
+  side      String   // "buy" or "sell"
+  priceUsdc BigInt   @map("price_usdc")
+  amount    BigInt
+  wallet    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  asset     Asset    @relation(fields: [mint], references: [mint])
+
+  @@map("trades")
+}
+
+model Position {
+  id        String   @id @default(cuid())
+  wallet    String
+  mint      String
+  shares    BigInt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  asset     Asset    @relation(fields: [mint], references: [mint])
+
+  @@unique([wallet, mint])
+  @@map("positions")
+}
+
+model Dividend {
+  id          String   @id @default(cuid())
+  mint        String
+  index       BigInt
+  totalAmount BigInt   @map("total_amount")
+  ts          DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  asset       Asset    @relation(fields: [mint], references: [mint])
+  claims      Claim[]
+
+  @@unique([mint, index])
+  @@map("dividends")
+}
+
+model Claim {
+  id         String   @id @default(cuid())
+  dividendId String   @map("dividend_id")
+  wallet     String
+  amount     BigInt
+  ts         DateTime
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  dividend   Dividend @relation(fields: [dividendId], references: [id])
+
+  @@unique([dividendId, wallet])
+  @@map("claims")
+}
