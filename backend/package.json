@@ -1,0 +1,22 @@
+{
+  "name": "rwa_backend",
+  "version": "1.0.0",
+  "description": "RWA Backend Anchor Programs",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.95.4",
+    "@solana/spl-token": "^0.4.8"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.8",
+    "@types/node": "^22.7.5",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.6.3",
+    "mocha": "^10.7.3",
+    "chai": "^5.1.1"
+  }
+}
